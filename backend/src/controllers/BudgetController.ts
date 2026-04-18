@@ -40,9 +40,38 @@ export class BudgetController {
 		}
 	}
 	static updateById = async (req: Request, res: Response) => {
-		console.log('desde el router/edit')
+		try {
+			const { id } = req.params;
+			if (Array.isArray(id)) {
+				return res.status(400).json({ error: 'ID inválido' });
+			}
+			const budget = await Budget.findByPk(id);
+			if (!budget) {
+				return res.status(404).json({ error: 'Presupuesto no encontrado' });
+			}
+			//Escribir los nuevos valores en el presupuesto encontrado
+			await budget.update(req.body)
+
+			res.status(200).json("Presupuesto actualizado exitosamente");
+
+		} catch (error) {
+			res.status(500).json({ error: 'Error al obtener el presupuesto' });
+		}
 	}
 	static deleteById = async (req: Request, res: Response) => {
-		console.log('desde el router/deleteById')
+		try {
+			const { id } = req.params;
+			if (Array.isArray(id)) {
+				return res.status(400).json({ error: 'ID inválido' });
+			}
+			const budget = await Budget.findByPk(id);
+			if (!budget) {
+				return res.status(404).json({ error: 'Presupuesto no encontrado' });
+			}
+			await budget.destroy();
+			res.status(204).json("Presupuesto eliminado exitosamente"); //status 204 indica que la solicitud se ha procesado correctamente pero no hay contenido para devolver
+		} catch (error) {
+			res.status(500).json({ error: 'Error al eliminar el presupuesto' });
+		}
 	}
 }

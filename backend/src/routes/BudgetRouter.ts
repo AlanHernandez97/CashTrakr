@@ -6,7 +6,13 @@ import { handleInputErrors } from '../middleware/validation';
 const router = Router();
 
 router.get('/', BudgetController.getAll);
-router.get('/:id', BudgetController.getById);
+router.get('/:id',
+	param("id")
+		.isInt().withMessage("El ID no es válido")
+		.custom((value) => value > 0).withMessage("El ID debe ser mayor a cero"),
+	handleInputErrors, BudgetController.getById
+);
+
 router.post('/',
 	body("name")
 		.notEmpty()
@@ -16,14 +22,29 @@ router.post('/',
 		.isNumeric().withMessage("El monto debe ser un número")
 		.custom((value) => value > 0).withMessage("El monto debe ser mayor a cero"),
 	handleInputErrors,
-	BudgetController.create);
+	BudgetController.create
+);
+
 router.put('/:id',
 	param("id")
 		.isInt().withMessage("El ID no es válido")
 		.custom((value) => value > 0).withMessage("El ID debe ser mayor a cero"),
+	body("name")
+		.notEmpty()
+		.withMessage("El nombre es obligatorio"),
+	body("amount")
+		.notEmpty().withMessage("El monto es obligatorio")
+		.isNumeric().withMessage("El monto debe ser un número")
+		.custom((value) => value > 0).withMessage("El monto debe ser mayor a cero"),
 	handleInputErrors,
-	BudgetController.updateById);
-router.delete('/:id', BudgetController.deleteById);
+	BudgetController.updateById
+);
+
+router.delete('/:id',
+	param("id")
+		.isInt().withMessage("El ID no es válido")
+		.custom((value) => value > 0).withMessage("El ID debe ser mayor a cero"),
+	handleInputErrors, BudgetController.deleteById);
 
 
 export default router;
