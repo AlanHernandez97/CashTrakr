@@ -2,49 +2,21 @@ import Router from 'express';
 import { BudgetController } from '../controllers/BudgetController';
 import { body, param } from 'express-validator';
 import { handleInputErrors } from '../middleware/validation';
+import { validateBudgetExist, validateBudgetId, validateBudgetInput } from '../middleware/Budget';
 
 const router = Router();
 
+router.param('budgetId', validateBudgetId);
+router.param('budgetId', validateBudgetExist);
+
 router.get('/', BudgetController.getAll);
-router.get('/:id',
-	param("id")
-		.isInt().withMessage("El ID no es válido")
-		.custom((value) => value > 0).withMessage("El ID debe ser mayor a cero"),
-	handleInputErrors, BudgetController.getById
-);
+router.get('/:budgetId', BudgetController.getById);
 
-router.post('/',
-	body("name")
-		.notEmpty()
-		.withMessage("El nombre es obligatorio"),
-	body("amount")
-		.notEmpty().withMessage("El monto es obligatorio")
-		.isNumeric().withMessage("El monto debe ser un número")
-		.custom((value) => value > 0).withMessage("El monto debe ser mayor a cero"),
-	handleInputErrors,
-	BudgetController.create
-);
+router.post('/', validateBudgetInput, BudgetController.create);
 
-router.put('/:id',
-	param("id")
-		.isInt().withMessage("El ID no es válido")
-		.custom((value) => value > 0).withMessage("El ID debe ser mayor a cero"),
-	body("name")
-		.notEmpty()
-		.withMessage("El nombre es obligatorio"),
-	body("amount")
-		.notEmpty().withMessage("El monto es obligatorio")
-		.isNumeric().withMessage("El monto debe ser un número")
-		.custom((value) => value > 0).withMessage("El monto debe ser mayor a cero"),
-	handleInputErrors,
-	BudgetController.updateById
-);
+router.put('/:budgetId', validateBudgetInput, BudgetController.updateById);
 
-router.delete('/:id',
-	param("id")
-		.isInt().withMessage("El ID no es válido")
-		.custom((value) => value > 0).withMessage("El ID debe ser mayor a cero"),
-	handleInputErrors, BudgetController.deleteById);
+router.delete('/:budgetId', BudgetController.deleteById);
 
 
 export default router;
